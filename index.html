@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        attribute  vec4 vPosition;
+        attribute vec4 vColor;
+        attribute  vec3 vNormal;
+        varying vec4 fColor;
+        varying vec4 fLighting;
+        
+        uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        uniform vec4 lightPosition;
+        uniform float shininess;
+
+        void main()
+        {
+        
+            
+            vec3 pos = (modelViewMatrix * vPosition).xyz;
+            
+            //fixed light postion
+            
+            vec3 light = lightPosition.xyz;
+            vec3 L = normalize( light - pos );
+        
+            
+            vec3 E = normalize( -pos );
+            vec3 H = normalize( L + E );
+            
+            vec4 NN = vec4(vNormal,0);
+        
+            // Transform vertex normal into eye coordinates
+               
+            vec3 N = normalize( (modelViewMatrix*NN).xyz);
+        
+            // Compute terms in the illumination equation
+            vec4 ambient = ambientProduct;
+        
+            float Kd = max( dot(L, N), 0.0 );
+            vec4  diffuse = Kd*diffuseProduct;
+        
+            float Ks = pow( max(dot(N, H), 0.0), shininess );
+            vec4  specular = Ks * specularProduct;
+            
+            if( dot(L, N) < 0.0 ) {
+            specular = vec4(0.0, 0.0, 0.0, 1.0);
+            } 
+        
+            gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+            fLighting = ambient + diffuse +specular;
+            fColor = vColor;
+            
+        }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+
+
+        varying vec4 fColor;
+        
+        varying vec4 fLighting;
+
+        uniform bool shaderOn;
+        
+        void main()
+        {
+            if(shaderOn){
+                gl_FragColor = fColor * fLighting;
+            } else {
+                gl_FragColor = fColor;
+            }
+        }
+
+    </script>
+
+    <script type="text/javascript" src="webgl/utils/webgl-utils.js"></script>
+    <script type="text/javascript" src="webgl/utils/initShaders.js"></script>
+    <script type="text/javascript" src="webgl/utils/MV.js"></script>
+    <script type="text/javascript" src="webgl/utils/colors.js"></script>
+    <script type="text/javascript" src="webgl/shapes/shape.js"></script>
+    <script type="text/javascript" src="webgl/shapes/simple/simpleShape.js"></script>
+    <script type="text/javascript" src="webgl/shapes/simple/pyramid.js"></script>
+    <script type="text/javascript" src="webgl/shapes/simple/cube.js"></script>
+    <script type="text/javascript" src="webgl/shapes/simple/rectangle.js"></script>
+    <script type="text/javascript" src="webgl/shapes/composite/compositeShape.js"></script>
+    <script type="text/javascript" src="webgl/shapes/composite/hollowCube.js"></script>
+    <script type="text/javascript" src="webgl/shapes/composite/hollowMine.js"></script>
+    <script type="text/javascript" src="webgl/shapes/composite/hollowChair.js"></script>
+    <script type="text/javascript" src="webgl/shapes/composite/snake.js"></script>
+    <script type="text/javascript" src="webgl/shapes/composite/person.js"></script>
+    <script type="text/javascript" src="webgl/mywebgl.js"></script>
+    <script type="text/javascript" src="inputListeners.js"></script>
+    <script type="text/javascript" src="webgl/utils/saveload.js"></script>
+    
+</head>
+
+<body>
+    <canvas id="gl-canvas">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <div style="margin-top: 20px;">
+        <div> Projection type:
+            <select name="projection" id="projectionDropdown">
+                <option value="perspective">Perspective</option>
+                <option value="oblique">Oblique</option>
+                <option value="orthographic">Orthographic</option>
+            </select>
+        </div>
+        <div> <input id="followObjectCheckbox" type="checkbox" /> camera follows object </div>
+        </br>
+        <div> Shading:
+            <select name="shading" id="shadingDropdown">
+                <option value="ON">ON</option>
+                <option value="OFF">OFF</option>
+            </select>
+        </div>
+        <div ">
+            <button id="clearButton" style="background-color: rgb(189, 189, 111);">Clear</button>
+            <button id="resetButton" style="background-color: rgb(216, 124, 71);">Reset</button>
+            <button id="hollowCubeButton">Hollow Cube</button>
+            <button id="hollowChairButton">Hollow Chair</button>
+            <button id="hollowMineButton">Hollow Mine</button>
+        </div>
+        <button id="saveButton">Save</button>
+        <button id="loadButton" style="margin:5px;background-color: rgb(159, 176, 194);">Load
+            <input style="margin-left: 4px;margin-right: 3px;" type="file" id="fileSelector" accept=".json" autocomplete="off">
+        </button>    
+        <div class="popup" id="help">Helper
+                <span class="popuptext" id="myPopup">
+                    <h2>HOLLOW HELPER</h2>
+                    <p>Click any object button to start drawing
+                    </br>Object color will generate randomly
+                    </p>
+                    <p>Arrow up-down to zoom in-out</p>
+                    <p>
+                        Arrow left-right to change shape selection.</br>
+                        Most left obyek is camera, obyek start from 2nd most left                   
+                    </p>
+                    <p>WASDQE to move</p>
+                    <p>IJKLUO to rotate camera</p>
+                    <p>Arrow up-down to zoom in-out</p>
+                    <p>Clear button to clear all objects in canvas</p>
+                    <p>Reset button to reset camera view</p>
+                    <P>Use projection type dropdown for switching projection</P>
+                    <p>Use shader drodown to set shader ON/OFF</p>
+                    <p>There are also save and load button to save or load to/from file</p>
+                    <p>...Click Helper button to close helper view</p>
+                    
+
+
+                </span>
+        </div>
+    </br>
+        
+    </div>
+    </br>
+    <script type="text/javascript" src="script.js"></script>
+</body>
+
+</html>
