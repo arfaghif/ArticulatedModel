@@ -214,13 +214,17 @@ function initWebGL() {
 
 
     gl.activeTexture( gl.TEXTURE0 );
+
+
     gl.uniform1i(gl.getUniformLocation(program, "texMap"),0);
+
+    gl.activeTexture( gl.TEXTURE1 )
     gl.bindTexture( gl.TEXTURE_2D, texture1 );
     gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 1);
 
-    gl.activeTexture( gl.TEXTURE1 );
+    gl.activeTexture( gl.TEXTURE2 );
     gl.bindTexture( gl.TEXTURE_2D, texture2 );
-    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
+    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 2);
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
