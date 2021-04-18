@@ -26,15 +26,26 @@ function initEventListeners() {
         load()
     }
     document.getElementById("slider1").oninput = function(event) {
-        shapes.forEach(shape =>{
-            shape.onChangeTheta(1,event.target.value);
-        })
+        if(selectedIdx===-1){
+            shapes.forEach(shape =>{
+                shape.onChangeTheta(1,event.target.value);
+            })
+        }
+        else{
+            shapes[selectedIdx].onChangeTheta(1,event.target.value)
+        }
+        
 
     };
     document.getElementById("slider2").oninput = function(event) {
-        shapes.forEach(shape =>{
-            shape.onChangeTheta(2,event.target.value);
-        })
+        if(selectedIdx===-1){
+            shapes.forEach(shape =>{
+                shape.onChangeTheta(2,event.target.value);
+            })
+        }
+        else{
+            shapes[selectedIdx].onChangeTheta(2,event.target.value)
+        }
     };
 
     document.getElementById("hollowCubeButton").onclick = function () {
