@@ -41,6 +41,19 @@ var cyan = new Uint8Array([0, 255, 255, 255]);
 var magenta = new Uint8Array([255, 0, 255, 255]);
 var yellow = new Uint8Array([255, 255, 0, 255]);
 
+var xPos = new Image();
+xPos.src = 'cubeMap/pos-x.jpg';
+var yPos = new Image();
+yPos.src = 'cubeMap/pos-y.jpg';
+var zPos = new Image();
+zPos.src = 'cubeMap/pos-z.jpg';
+var xNeg = new Image();
+xNeg.src = 'cubeMap/neg-x.jpg';
+var yNeg = new Image();
+yNeg.src = 'cubeMap/neg-y.jpg';
+var zNeg = new Image();
+zNeg.src = 'cubeMap/neg-z.jpg';
+
 var cubeMap;
 var image1 = new Uint8Array(4*texSize*texSize);
 
@@ -84,27 +97,68 @@ var image2 = new Uint8Array(4*texSize*texSize);
 function configureCubeMap() {
 
     cubeMap = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);const faceInfos = [
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, 
+          url: './cubeMap/pos-x.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 
+          url: './cubeMap/neg-x.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 
+          url: './cubeMap/pos-y.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 
+          url: './cubeMap/neg-y.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 
+          url: './cubeMap/pos-z.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 
+          url: './cubeMap/neg-z.jpg',
+        },
+      ];
+      faceInfos.forEach((faceInfo) => {
+        const {target, url} = faceInfo;
+       
+        // Upload the canvas to the cubemap face.
+        const level = 0;
+        const internalFormat = gl.RGBA;
+        const width = 512;
+        const height = 512;
+        const format = gl.RGBA;
+        const type = gl.UNSIGNED_BYTE;
+       
+        // setup each face so it's immediately renderable
+        gl.texImage2D(target, level, internalFormat, width, height, 0, format, type, null);
+       
+        // Asynchronously load an image
+        const image = new Image();
+        image.src = url;
+        image.crossOrigin = "Anonymous";
+        image.addEventListener('load', function() {
+          // Now that the image has loaded upload it to the texture.
+          gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
+          gl.texImage2D(target, level, internalFormat, format, type, image);
+          gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+        });
+        // requestCORSIfNotSameOrigin(image, url);
+        // image.src = url;
+      });
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    }
 
-    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
-    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X ,0,gl.RGBA,
-        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, red);
-    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X ,0,gl.RGBA,
-        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, green);
-    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y ,0,gl.RGBA,
-        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, blue);
-    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y ,0,gl.RGBA,
-        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, cyan);
-    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z ,0,gl.RGBA,
-        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, yellow);
-    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z ,0,gl.RGBA,
-        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, magenta);
-
-
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
-}
-
-    
+// function requestCORSIfNotSameOrigin(img, url) {
+//     if ((new URL(url, window.location.href)).origin !== window.location.origin) {
+//         img.crossOrigin = "";
+//     }
+//     }
 function configureTexture() {
     texture1 = gl.createTexture();
     gl.bindTexture( gl.TEXTURE_2D, texture1 );
