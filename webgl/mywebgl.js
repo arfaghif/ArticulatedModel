@@ -29,11 +29,19 @@ var bottom = -1.0;
 const maxNumVertices = 20000;
 var cBufferId, vBufferId, nBufferId, tBufferId;
 var modelScaleMatrix, modelRotateMatrix, modelViewMatrix, projectionMatrix;
-var modelScaleMatrixLoc, modelRotateMatrixLoc, modelViewMatrixLoc, projectionMatrixLoc;
+var modelScaleMatrixLoc, modelRotateMatrixLoc, modelViewMatrixLoc, projectionMatrixLoc, normalMatrixLoc;
 var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc, shininessLoc,shaderOnLoc, textureOnLoc;
 var at;
 const up = vec3(0.0, 1.0, 0.0);
 
+var red = new Uint8Array([255, 0, 0, 255]);
+var green = new Uint8Array([0, 255, 0, 255]);
+var blue = new Uint8Array([0, 0, 255, 255]);
+var cyan = new Uint8Array([0, 255, 255, 255]);
+var magenta = new Uint8Array([255, 0, 255, 255]);
+var yellow = new Uint8Array([255, 255, 0, 255]);
+
+var cubeMap;
 var image1 = new Uint8Array(4*texSize*texSize);
 
     for ( var i = 0; i < texSize; i++ ) {
@@ -70,7 +78,33 @@ var image2 = new Uint8Array(4*texSize*texSize);
         vec2(1, 1),
         vec2(1, 0)
     ];
-     
+
+
+
+function configureCubeMap() {
+
+    cubeMap = gl.createTexture();
+
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X ,0,gl.RGBA,
+        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, red);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X ,0,gl.RGBA,
+        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, green);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y ,0,gl.RGBA,
+        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, blue);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y ,0,gl.RGBA,
+        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, cyan);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z ,0,gl.RGBA,
+        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, yellow);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z ,0,gl.RGBA,
+        1,1,0,gl.RGBA,gl.UNSIGNED_BYTE, magenta);
+
+
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_CUBE_MAP,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
+}
+
+    
 function configureTexture() {
     texture1 = gl.createTexture();
     gl.bindTexture( gl.TEXTURE_2D, texture1 );
@@ -136,19 +170,22 @@ function initWebGL() {
     gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vTexCoord );
 
-    configureTexture();
-    
+    // configureTexture();
+    configureCubeMap();
+
 
     gl.activeTexture( gl.TEXTURE0 );
-    gl.bindTexture( gl.TEXTURE_2D, texture1 );
-    gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 0);
+    gl.uniform1i(gl.getUniformLocation(program, "texMap"),0);
+    // gl.bindTexture( gl.TEXTURE_2D, texture1 );
+    // gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 0);
 
-    gl.activeTexture( gl.TEXTURE1 );
-    gl.bindTexture( gl.TEXTURE_2D, texture2 );
-    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
+    // gl.activeTexture( gl.TEXTURE1 );
+    // gl.bindTexture( gl.TEXTURE_2D, texture2 );
+    // gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+    normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
     ambientProductLoc = gl.getUniformLocation(program, "ambientProduct");
     diffuseProductLoc = gl.getUniformLocation(program, "diffuseProduct");
     specularProductLoc = gl.getUniformLocation(program, "specularProduct");
@@ -174,6 +211,12 @@ function renderWebGL() {
         modelViewMatrix = mult(modelViewMatrix, translate(cameraXYZ));
         modelViewMatrix = mult(modelViewMatrix, rotateXYZ(rotationXYZ));
     }
+    var normalMatrix = [
+        vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
+        vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
+        vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
+    ];
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
 
     // scale
     modelViewMatrix = mult(modelViewMatrix, scalem(scalingXYZ));
