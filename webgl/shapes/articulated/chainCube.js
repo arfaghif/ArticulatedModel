@@ -1,6 +1,5 @@
 class ChainCube extends ArticulatedShape {
-    constructor(color, center, rotation, scale, thetas) {
-        thetas = [0,0,0];
+    constructor(color, center, rotation, scale) {
         var colors = new Array(6).fill(color ?? RANDOM_COLOR());
         var baseCenter = vec3(0 , 0, 0);
         var baseRotation = vec3(0, 0, 0);

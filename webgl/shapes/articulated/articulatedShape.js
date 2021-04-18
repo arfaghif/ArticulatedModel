@@ -1,15 +1,26 @@
 class ArticulatedShape extends Shape {
-    constructor(shapeName, shape, theta, axisRotate, vTranslate, center, rotation, scale) {
+    constructor(shapeName, shape, thetaSlider, axisRotate, vTranslate, center, rotation, scale) {
         super('articulated-' + shapeName, center, rotation, scale);
         this.shape = shape;
         this.numVertices = shape.numVertices;
         this.child = [];
-        this.theta = theta;
+        this.theta = 0;
+        this.thetaSlider = thetaSlider
         this.axisRotate = axisRotate;
         this.vTranslate = vTranslate;
         this.isUpToDate = false;
         this.isBase = true;
         this.parent = null;
+    }
+
+
+    onChangeTheta(numSlider,value){
+        if(numSlider === this.thetaSlider){
+            this.theta = value;
+        }
+        this.child.forEach(shape =>{
+            shape.onChangeTheta(numSlider,value);
+        });
     }
 
     addChild(shape){
@@ -25,9 +36,11 @@ class ArticulatedShape extends Shape {
 
     calcTransformationMatrix(){
         if (this.isBase){
-            return mult(super.calcTransformationMatrix() ,  rotate(this.theta,...this.axisRotate));
+            return super.calcTransformationMatrix();
         }else{
-            return this.parent.calcTransformationMatrix();
+            var t = mult(this.parent.calcTransformationMatrix(), translate(...this.vTranslate));
+            var r = mult(t,rotate(this.theta,...this.axisRotate));
+            return mult(r,translate(negate(vec3(...this.vTranslate))));
         }
     }
 
