@@ -27,10 +27,10 @@ function initEventListeners() {
     }
 
     document.getElementById("hollowCubeButton").onclick = function () {
-        shapes.push(new HollowCube());
+        shapes.push(new Hand());
     }
     document.getElementById("hollowChairButton").onclick = function () {
-        shapes.push(new HollowChair());
+        shapes.push(new ChainCube());
     }
     document.getElementById("hollowMineButton").onclick = function () {
         shapes.push(new HollowMine());
