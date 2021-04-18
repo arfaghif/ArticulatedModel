@@ -97,7 +97,8 @@ var image2 = new Uint8Array(4*texSize*texSize);
 function configureCubeMap() {
 
     cubeMap = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);const faceInfos = [
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
+    const cubeImage = [
         {
           target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, 
           url: './cubeMap/pos-x.jpg',
@@ -123,42 +124,26 @@ function configureCubeMap() {
           url: './cubeMap/neg-z.jpg',
         },
       ];
-      faceInfos.forEach((faceInfo) => {
-        const {target, url} = faceInfo;
+      cubeImage.forEach((cubeImg) => {
+        const {target, url} = cubeImg;
        
-        // Upload the canvas to the cubemap face.
-        const level = 0;
-        const internalFormat = gl.RGBA;
-        const width = 512;
-        const height = 512;
-        const format = gl.RGBA;
-        const type = gl.UNSIGNED_BYTE;
-       
-        // setup each face so it's immediately renderable
-        gl.texImage2D(target, level, internalFormat, width, height, 0, format, type, null);
+        gl.texImage2D(target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
        
         // Asynchronously load an image
         const image = new Image();
         image.src = url;
         image.crossOrigin = "Anonymous";
         image.addEventListener('load', function() {
-          // Now that the image has loaded upload it to the texture.
           gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
-          gl.texImage2D(target, level, internalFormat, format, type, image);
+          gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
           gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
         });
-        // requestCORSIfNotSameOrigin(image, url);
-        // image.src = url;
       });
       gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
       gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     }
 
-// function requestCORSIfNotSameOrigin(img, url) {
-//     if ((new URL(url, window.location.href)).origin !== window.location.origin) {
-//         img.crossOrigin = "";
-//     }
-//     }
+
 function configureTexture() {
     texture1 = gl.createTexture();
     gl.bindTexture( gl.TEXTURE_2D, texture1 );
@@ -224,18 +209,18 @@ function initWebGL() {
     gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vTexCoord );
 
-    // configureTexture();
+    configureTexture();
     configureCubeMap();
 
 
     gl.activeTexture( gl.TEXTURE0 );
     gl.uniform1i(gl.getUniformLocation(program, "texMap"),0);
-    // gl.bindTexture( gl.TEXTURE_2D, texture1 );
-    // gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 0);
+    gl.bindTexture( gl.TEXTURE_2D, texture1 );
+    gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 1);
 
-    // gl.activeTexture( gl.TEXTURE1 );
-    // gl.bindTexture( gl.TEXTURE_2D, texture2 );
-    // gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
+    gl.activeTexture( gl.TEXTURE1 );
+    gl.bindTexture( gl.TEXTURE_2D, texture2 );
+    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
