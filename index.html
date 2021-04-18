@@ -11,14 +11,20 @@
         attribute  vec4 vPosition;
         attribute vec4 vColor;
         attribute  vec3 vNormal;
+        attribute  vec2 vTexCoord;
+
         varying vec4 fColor;
         varying vec4 fLighting;
+        varying vec2 fTexCoord;
+        
         
         uniform vec4 ambientProduct, diffuseProduct, specularProduct;
         uniform mat4 modelViewMatrix;
         uniform mat4 projectionMatrix;
         uniform vec4 lightPosition;
         uniform float shininess;
+
+        uniform vec3 theta;
 
         void main()
         {
@@ -57,6 +63,7 @@
             gl_Position = projectionMatrix * modelViewMatrix * vPosition;
             fLighting = ambient + diffuse +specular;
             fColor = vColor;
+            fTexCoord = vTexCoord;
             
         }
     </script>
@@ -70,13 +77,17 @@
         varying vec4 fLighting;
 
         uniform bool shaderOn;
+        varying  vec2 fTexCoord;
+
+        uniform sampler2D Tex0;
+        uniform sampler2D Tex1;
         
         void main()
         {
             if(shaderOn){
                 gl_FragColor = fColor * fLighting;
             } else {
-                gl_FragColor = fColor;
+                gl_FragColor = fColor*(texture2D(Tex0, fTexCoord)*texture2D(Tex1, fTexCoord));
             }
         }
 

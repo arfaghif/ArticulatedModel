@@ -1,6 +1,7 @@
 var canvas;
 var gl;
-
+var texSize = 256;
+var numChecks = 8;
 //shading
 // var viewerPos;
 // var thetaLoc;
@@ -26,13 +27,69 @@ var bottom = -1.0;
 
 // webgl matrices
 const maxNumVertices = 20000;
-var cBufferId, vBufferId, nBufferId;
+var cBufferId, vBufferId, nBufferId, tBufferId;
 var modelScaleMatrix, modelRotateMatrix, modelViewMatrix, projectionMatrix;
 var modelScaleMatrixLoc, modelRotateMatrixLoc, modelViewMatrixLoc, projectionMatrixLoc;
 var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc, shininessLoc,shaderOnLoc;
 var at;
 const up = vec3(0.0, 1.0, 0.0);
 
+var image1 = new Uint8Array(4*texSize*texSize);
+
+    for ( var i = 0; i < texSize; i++ ) {
+        for ( var j = 0; j <texSize; j++ ) {
+            var patchx = Math.floor(i/(texSize/numChecks));
+            var patchy = Math.floor(j/(texSize/numChecks));
+            if(patchx%2 ^ patchy%2) c = 255;
+            else c = 0;
+            //c = 255*(((i & 0x8) == 0) ^ ((j & 0x8)  == 0))
+            image1[4*i*texSize+4*j] = c;
+            image1[4*i*texSize+4*j+1] = c;
+            image1[4*i*texSize+4*j+2] = c;
+            image1[4*i*texSize+4*j+3] = 255;
+        }
+    }
+
+var image2 = new Uint8Array(4*texSize*texSize);
+
+    // Create a checkerboard pattern
+    for ( var i = 0; i < texSize; i++ ) {
+        for ( var j = 0; j <texSize; j++ ) {
+            image2[4*i*texSize+4*j] = 127+127*Math.sin(0.1*i*j);
+            image2[4*i*texSize+4*j+1] = 127+127*Math.sin(0.1*i*j);
+            image2[4*i*texSize+4*j+2] = 127+127*Math.sin(0.1*i*j);
+            image2[4*i*texSize+4*j+3] = 255;
+           }
+    }
+
+    var texCoordsArray = [];
+
+    var texCoord = [
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1, 1),
+        vec2(1, 0)
+    ];
+     
+function configureTexture() {
+    texture1 = gl.createTexture();
+    gl.bindTexture( gl.TEXTURE_2D, texture1 );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, image1);
+    gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                      gl.NEAREST_MIPMAP_LINEAR );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    texture2 = gl.createTexture();
+    gl.bindTexture( gl.TEXTURE_2D, texture2 );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, image2);
+    gl.generateMipmap( gl.TEXTURE_2D );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                      gl.NEAREST_MIPMAP_LINEAR );
+    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+}
 function initWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
@@ -69,6 +126,25 @@ function initWebGL() {
     gl.enableVertexAttribArray(vPosition);
     // thetaLoc = gl.getUniformLocation(program, "theta");
     // viewerPos = vec3(0.0, 0.0, -20.0 );
+    tBufferId = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBufferId);
+    gl.bufferData(gl.ARRAY_BUFFER, 2 * maxNumVertices, gl.STATIC_DRAW);
+    
+
+    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
+    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vTexCoord );
+
+    configureTexture();
+    
+
+    gl.activeTexture( gl.TEXTURE0 );
+    gl.bindTexture( gl.TEXTURE_2D, texture1 );
+    gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 0);
+
+    gl.activeTexture( gl.TEXTURE1 );
+    gl.bindTexture( gl.TEXTURE_2D, texture2 );
+    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
@@ -153,3 +229,5 @@ function renderWebGL() {
     });
     gl.drawArrays(gl.TRIANGLES, 0, totalVectices);
 }
+
+

@@ -42,6 +42,16 @@ class Cube extends SimpleShape {
         ...Cube.quad(6, 5, 1, 2),
     ];
 
+    static texCoord = [
+        vec2(0, 0),
+        vec2(0, 1),
+        vec2(1,1 ),
+        vec2(0, 0),
+        vec2(1, 1),
+        vec2(1, 0)
+
+    ];
+
     constructor(colors, center, rotation, scale) {
         super('cube', 6, 6, colors, center, rotation, scale);
     }
@@ -51,6 +61,7 @@ class Cube extends SimpleShape {
             points: Cube.unitShape.map(vertice => mult(mult(transformationMatrix || mat4(), this.calcTransformationMatrix()), vertice)),
             colors: this.colorShape(),
             normals: Cube.normShape,
+            textures: Cube.texCoord,
         });
     }
 }

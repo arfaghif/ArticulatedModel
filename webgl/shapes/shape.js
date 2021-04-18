@@ -122,6 +122,11 @@ class Shape {
         gl.bufferSubData(gl.ARRAY_BUFFER, 12 * startIdx, flatten(updatedArray.normals));
         gl.bindBuffer(gl.ARRAY_BUFFER, vBufferId);
         gl.bufferSubData(gl.ARRAY_BUFFER, 16 * startIdx, flatten(updatedArray.points));
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, tBufferId);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 8 * startIdx, flatten(updatedArray.textures));
+
+
         this.isUpToDate = true;
     }
 }
