@@ -12,7 +12,8 @@
         attribute vec4 vColor;
         attribute  vec3 vNormal;
         attribute  vec2 vTexCoord;
-
+        
+        varying vec3 R;
         varying vec4 fColor;
         varying vec4 fLighting;
         varying vec2 fTexCoord;
@@ -21,6 +22,7 @@
         uniform vec4 ambientProduct, diffuseProduct, specularProduct;
         uniform mat4 modelViewMatrix;
         uniform mat4 projectionMatrix;
+        uniform mat3 normalMatrix;
         uniform vec4 lightPosition;
         uniform float shininess;
 
@@ -64,6 +66,11 @@
             fLighting = ambient + diffuse +specular;
             fColor = vColor;
             fTexCoord = vTexCoord;
+
+            //env map
+            vec3 eyePos  = (modelViewMatrix*vPosition).xyz;
+            R = reflect(eyePos, N);
+
             
         }
     </script>
@@ -76,6 +83,7 @@
         
         varying vec4 fLighting;
         vec4 shaderColor;
+        varying vec3 R;
 
         uniform int textureOn;
         uniform bool shaderOn;
@@ -84,6 +92,7 @@
 
         uniform sampler2D Tex0;
         uniform sampler2D Tex1;
+        uniform samplerCube texMap;
         
         void main()
         {
@@ -94,6 +103,9 @@
             }
             if(textureOn == 1){
                 gl_FragColor = shaderColor*(texture2D(Tex0, fTexCoord)*texture2D(Tex1, fTexCoord));
+            }
+            else if(textureOn == 2){
+                gl_FragColor = textureCube(texMap, R);
             }
             else {
                 gl_FragColor = shaderColor;
@@ -163,6 +175,7 @@
             <select name="texture" id="textureDropdown">
                 <option value="Off">Off</option>
                 <option value="Pattern">Pattern</option>
+                <option value="Environment">Environment</option>
             </select>
         </div>
 

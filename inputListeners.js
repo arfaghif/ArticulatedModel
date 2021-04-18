@@ -9,6 +9,8 @@ function initEventListeners() {
     document.getElementById("textureDropdown").onchange = function (event) {
         if (event.target.value == "Pattern"){
             textureOn = 1;
+        }else if(event.target.value=="Environment"){
+            textureOn = 2;
         }else{
             textureOn = 0;
         }

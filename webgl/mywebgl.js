@@ -29,11 +29,32 @@ var bottom = -1.0;
 const maxNumVertices = 20000;
 var cBufferId, vBufferId, nBufferId, tBufferId;
 var modelScaleMatrix, modelRotateMatrix, modelViewMatrix, projectionMatrix;
-var modelScaleMatrixLoc, modelRotateMatrixLoc, modelViewMatrixLoc, projectionMatrixLoc;
+var modelScaleMatrixLoc, modelRotateMatrixLoc, modelViewMatrixLoc, projectionMatrixLoc, normalMatrixLoc;
 var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc, shininessLoc,shaderOnLoc, textureOnLoc;
 var at;
 const up = vec3(0.0, 1.0, 0.0);
 
+var red = new Uint8Array([255, 0, 0, 255]);
+var green = new Uint8Array([0, 255, 0, 255]);
+var blue = new Uint8Array([0, 0, 255, 255]);
+var cyan = new Uint8Array([0, 255, 255, 255]);
+var magenta = new Uint8Array([255, 0, 255, 255]);
+var yellow = new Uint8Array([255, 255, 0, 255]);
+
+var xPos = new Image();
+xPos.src = 'cubeMap/pos-x.jpg';
+var yPos = new Image();
+yPos.src = 'cubeMap/pos-y.jpg';
+var zPos = new Image();
+zPos.src = 'cubeMap/pos-z.jpg';
+var xNeg = new Image();
+xNeg.src = 'cubeMap/neg-x.jpg';
+var yNeg = new Image();
+yNeg.src = 'cubeMap/neg-y.jpg';
+var zNeg = new Image();
+zNeg.src = 'cubeMap/neg-z.jpg';
+
+var cubeMap;
 var image1 = new Uint8Array(4*texSize*texSize);
 
     for ( var i = 0; i < texSize; i++ ) {
@@ -70,7 +91,59 @@ var image2 = new Uint8Array(4*texSize*texSize);
         vec2(1, 1),
         vec2(1, 0)
     ];
-     
+
+
+
+function configureCubeMap() {
+
+    cubeMap = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
+    const cubeImage = [
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, 
+          url: './cubeMap/pos-x.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 
+          url: './cubeMap/neg-x.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 
+          url: './cubeMap/pos-y.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 
+          url: './cubeMap/neg-y.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 
+          url: './cubeMap/pos-z.jpg',
+        },
+        {
+          target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 
+          url: './cubeMap/neg-z.jpg',
+        },
+      ];
+      cubeImage.forEach((cubeImg) => {
+        const {target, url} = cubeImg;
+       
+        gl.texImage2D(target, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+       
+        // Asynchronously load an image
+        const image = new Image();
+        image.src = url;
+        image.crossOrigin = "Anonymous";
+        image.addEventListener('load', function() {
+          gl.bindTexture(gl.TEXTURE_CUBE_MAP, cubeMap);
+          gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+          gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+        });
+      });
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    }
+
+
 function configureTexture() {
     texture1 = gl.createTexture();
     gl.bindTexture( gl.TEXTURE_2D, texture1 );
@@ -137,18 +210,25 @@ function initWebGL() {
     gl.enableVertexAttribArray( vTexCoord );
 
     configureTexture();
-    
+    configureCubeMap();
+
 
     gl.activeTexture( gl.TEXTURE0 );
-    gl.bindTexture( gl.TEXTURE_2D, texture1 );
-    gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 0);
 
-    gl.activeTexture( gl.TEXTURE1 );
+
+    gl.uniform1i(gl.getUniformLocation(program, "texMap"),0);
+
+    gl.activeTexture( gl.TEXTURE1 )
+    gl.bindTexture( gl.TEXTURE_2D, texture1 );
+    gl.uniform1i(gl.getUniformLocation( program, "Tex0"), 1);
+
+    gl.activeTexture( gl.TEXTURE2 );
     gl.bindTexture( gl.TEXTURE_2D, texture2 );
-    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 1);
+    gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 2);
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+    normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
     ambientProductLoc = gl.getUniformLocation(program, "ambientProduct");
     diffuseProductLoc = gl.getUniformLocation(program, "diffuseProduct");
     specularProductLoc = gl.getUniformLocation(program, "specularProduct");
@@ -174,6 +254,12 @@ function renderWebGL() {
         modelViewMatrix = mult(modelViewMatrix, translate(cameraXYZ));
         modelViewMatrix = mult(modelViewMatrix, rotateXYZ(rotationXYZ));
     }
+    var normalMatrix = [
+        vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
+        vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
+        vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
+    ];
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
 
     // scale
     modelViewMatrix = mult(modelViewMatrix, scalem(scalingXYZ));
