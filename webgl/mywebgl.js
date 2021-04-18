@@ -30,7 +30,7 @@ const maxNumVertices = 20000;
 var cBufferId, vBufferId, nBufferId, tBufferId;
 var modelScaleMatrix, modelRotateMatrix, modelViewMatrix, projectionMatrix;
 var modelScaleMatrixLoc, modelRotateMatrixLoc, modelViewMatrixLoc, projectionMatrixLoc;
-var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc, shininessLoc,shaderOnLoc;
+var ambientProductLoc, diffuseProductLoc, specularProductLoc, lightPositionLoc, shininessLoc,shaderOnLoc, textureOnLoc;
 var at;
 const up = vec3(0.0, 1.0, 0.0);
 
@@ -126,6 +126,7 @@ function initWebGL() {
     gl.enableVertexAttribArray(vPosition);
     // thetaLoc = gl.getUniformLocation(program, "theta");
     // viewerPos = vec3(0.0, 0.0, -20.0 );
+
     tBufferId = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, tBufferId);
     gl.bufferData(gl.ARRAY_BUFFER, 2 * maxNumVertices, gl.STATIC_DRAW);
@@ -154,6 +155,7 @@ function initWebGL() {
     lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
     shininessLoc = gl.getUniformLocation(program, "shininess");
     shaderOnLoc = gl.getUniformLocation(program, "shaderOn");
+    textureOnLoc = gl.getUniformLocation(program, "textureOn");
 }
 
 function renderWebGL() {
@@ -214,6 +216,7 @@ function renderWebGL() {
 
     gl.uniform1f(shininessLoc,materialShininess);
     gl.uniform1f(shaderOnLoc,shaderOn);
+    gl.uniform1i(textureOnLoc,textureOn);
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     // webgl stuffs
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

@@ -6,6 +6,13 @@ function initEventListeners() {
     document.getElementById("shadingDropdown").onchange = function (event) {
         shaderOn = event.target.value === "ON";
     };
+    document.getElementById("textureDropdown").onchange = function (event) {
+        if (event.target.value == "Pattern"){
+            textureOn = 1;
+        }else{
+            textureOn = 0;
+        }
+    };
     document.getElementById("clearButton").onclick = function () {
         while (shapes.length) {
             shapes.pop();

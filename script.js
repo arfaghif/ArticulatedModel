@@ -14,6 +14,7 @@ var projectionType;
 var isFollowingObject;
 var selectedIdx;
 var shaderOn;
+var textureOn;
 
 function initVariables() {
     cameraXYZ = vec3(0, 0, -3);

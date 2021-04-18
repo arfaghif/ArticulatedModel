@@ -42,14 +42,21 @@ class Cube extends SimpleShape {
         ...Cube.quad(6, 5, 1, 2),
     ];
 
-    static texCoord = [
+    static text = [
         vec2(0, 0),
         vec2(0, 1),
         vec2(1,1 ),
         vec2(0, 0),
         vec2(1, 1),
         vec2(1, 0)
-
+    ];
+    static texCoord = [
+        ...Cube.text,
+        ...Cube.text,
+        ...Cube.text,
+        ...Cube.text,
+        ...Cube.text,
+        ...Cube.text
     ];
 
     constructor(colors, center, rotation, scale) {
