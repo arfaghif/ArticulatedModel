@@ -44,7 +44,7 @@ function initEventListeners() {
         shapes.push(new ChainCube());
     }
     document.getElementById("hollowMineButton").onclick = function () {
-        shapes.push(new HollowMine());
+        shapes.push(new Dustbin());
     }
     document.getElementById("help").onclick = function () {
         var popup = document.getElementById("myPopup");
