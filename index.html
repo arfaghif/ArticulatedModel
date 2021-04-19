@@ -6,7 +6,8 @@
 
 <head>
     <link rel="stylesheet" href="style.css">
-
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <script id="vertex-shader" type="x-shader/x-vertex">
         attribute  vec4 vPosition;
         attribute vec4 vColor;
@@ -139,46 +140,9 @@
 </head>
 
 <body>
-    <div>
-        Finger angle -180 <input id="slider1" type="range"
-         min="-180" max="180" step="10" value="0"
-          />
-         180
-        </div><br/>
+    <!-- <div style="height: 12px;"></div> -->
+    <center>
         
-        <div>
-        Finger sub angle -180 <input id="slider2" type="range"
-         min="-180" max="180" step="10" value="0"
-          />
-         180
-        </div><br/>
-    <canvas id="gl-canvas">
-        Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-    <div style="margin-top: 20px;">
-        <div> Projection type:
-            <select name="projection" id="projectionDropdown">
-                <option value="perspective">Perspective</option>
-                <option value="oblique">Oblique</option>
-                <option value="orthographic">Orthographic</option>
-            </select>
-        </div>
-        <div> <input id="followObjectCheckbox" type="checkbox" /> camera follows object </div>
-        </br>
-        <div> Shading:
-            <select name="shading" id="shadingDropdown">
-                <option value="ON">ON</option>
-                <option value="OFF">OFF</option>
-            </select>
-        </div>
-        <div> Texture:
-            <select name="texture" id="textureDropdown">
-                <option value="Off">Off</option>
-                <option value="Pattern">Pattern</option>
-                <option value="Environment">Environment</option>
-            </select>
-        </div>
-
         <div ">
             <button id="clearButton" style="background-color: rgb(189, 189, 111);">Clear</button>
             <button id="resetButton" style="background-color: rgb(216, 124, 71);">Reset</button>
@@ -188,7 +152,7 @@
         </div>
         <button id="saveButton">Save</button>
         <button id="loadButton" style="margin:5px;background-color: rgb(159, 176, 194);">Load
-            <input style="margin-left: 4px;margin-right: 3px;" type="file" id="fileSelector" accept=".json" autocomplete="off">
+            <input style="margin-left: 4px; margin-right: -75px;" type="file" id="fileSelector" accept=".json" autocomplete="off">
         </button>    
         <div class="popup" id="help">Helper
                 <span class="popuptext" id="myPopup">
@@ -215,11 +179,77 @@
 
                 </span>
         </div>
-    </br>
-        
-    </div>
+        <div style="margin-top: 20px;"></div>
+    <canvas id="gl-canvas">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    
+
+   
     </br>
     
+    <div class="tight">
+    <div class="row">
+        <div class="column">
+            <div style="margin-top: 5px;">
+                <div> Projection type:
+                    <select name="projection" id="projectionDropdown">
+                        <option value="perspective">Perspective</option>
+                        <option value="oblique">Oblique</option>
+                        <option value="orthographic">Orthographic</option>
+                    </select>
+                </div>
+                <div style="margin-top: 10px;"></div>
+                <div> <input id="followObjectCheckbox" type="checkbox" /> camera follows object </div>
+                
+                
+                
+                <!-- </br> -->
+            </div>
+        </div>
+        <div class="column">
+            <!-- start -->
+            <div style="margin-top: 5px;"></div>
+            <div> Shading:
+                <select name="shading" id="shadingDropdown">
+                    <option value="ON">ON</option>
+                    <option value="OFF">OFF</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px;"></div>
+            <div> Texture:
+                <select name="texture" id="textureDropdown">
+                    <option value="Off">Off</option>
+                    <option value="Pattern">Pattern</option>
+                    <option value="Environment">Environment</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px;"></div>
+            <!-- start -->
+        </div>
+        <div class="column">
+            <div>
+                <div class="mentokin-kiri">
+                    <div>
+                        <div style="margin-top: 5px;"></div>
+                    <!-- <br/> -->
+                    Angle -180 <input id="slider1" type="range" min="-180" max="180" step="10" value="0" />
+                    180
+                    </div>
+                    <div style="margin-top: 5px;"></div>
+                    
+                    <div>
+                    Sub-angle -180 
+                    <input id="slider2" type="range" min="-180" max="180" step="10" value="0" />
+                    180
+                    </div>
+                    <br/>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    </center>
 
     <script type="text/javascript" src="script.js"></script>
 </body>
