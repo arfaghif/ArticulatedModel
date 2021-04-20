@@ -385,12 +385,13 @@ function renderWebGL() {
     var totalVectices = 0;
     shapes.forEach((shape, i) => {
         if (!shape.isUpToDate) {
-            // gl.uniform1i(textureOnLoc,shape.texture);
+            gl.uniform1i(textureOnLoc,shape.texture);
             shape.update(totalVectices, mat4(), selectedIdx === i);
         }
+        gl.drawArrays(gl.TRIANGLES, totalVectices, shape.numVertices);
         totalVectices += shape.numVertices;
     });
-    gl.drawArrays(gl.TRIANGLES, 0, totalVectices);
+    
 }
 
 
