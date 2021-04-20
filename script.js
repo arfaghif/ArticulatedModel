@@ -37,53 +37,54 @@ window.onload = function setup() {
 
 function updateCamera() {
     if (keypressed.has('w')) {
-        if (selectedIdx === -1) cameraXYZ[2] += walkSpeed;
-        else shapes[selectedIdx].moveX(walkSpeed);
+        if (selectedIdx === -1) cameraXYZ[1] -= walkSpeed;
+        else shapes[selectedIdx].moveY(walkSpeed);
     }
     if (keypressed.has('s')) {
-        if (selectedIdx === -1) cameraXYZ[2] -= walkSpeed;
-        else shapes[selectedIdx].moveX(-walkSpeed);
+        if (selectedIdx === -1) cameraXYZ[1] += walkSpeed;
+        else shapes[selectedIdx].moveY(-walkSpeed);
     }
     if (keypressed.has('a')) {
         if (selectedIdx === -1) cameraXYZ[0] += walkSpeed;
-        else shapes[selectedIdx].moveZ(walkSpeed);
+        else shapes[selectedIdx].moveX(-walkSpeed);
     }
     if (keypressed.has('d')) {
         if (selectedIdx === -1) cameraXYZ[0] -= walkSpeed;
-        else shapes[selectedIdx].moveZ(-walkSpeed);
+        else shapes[selectedIdx].moveX(walkSpeed);
     }
     if (keypressed.has('e')) {
-        if (selectedIdx === -1) cameraXYZ[0] += walkSpeed;
-        else shapes[selectedIdx].moveY(walkSpeed);
+        if (selectedIdx === -1) cameraXYZ[2] -= walkSpeed;
+        else shapes[selectedIdx].moveZ(walkSpeed);
     }
     if (keypressed.has('q')) {
-        if (selectedIdx === -1) cameraXYZ[0] -= walkSpeed;
-        else shapes[selectedIdx].moveY(-walkSpeed);
+        if (selectedIdx === -1) cameraXYZ[2] += walkSpeed;
+        else shapes[selectedIdx].moveZ(-walkSpeed);
+        
     }
 
 
     if (keypressed.has('i')) {
         if (selectedIdx === -1) rotationXYZ[0] += rotSpeed;
-        else shapes[selectedIdx].rotateX(rotSpeed);
+        else shapes[selectedIdx].rotateX(-rotSpeed);
     }
     if (keypressed.has('k')) {
         if (selectedIdx === -1) rotationXYZ[0] -= rotSpeed;
-        else shapes[selectedIdx].rotateX(-rotSpeed);
+        else shapes[selectedIdx].rotateX(rotSpeed);
     }
     if (keypressed.has('j')) {
         if (selectedIdx === -1) rotationXYZ[1] += rotSpeed;
-        else shapes[selectedIdx].rotateY(rotSpeed);
+        else shapes[selectedIdx].rotateY(-rotSpeed);
     }
     if (keypressed.has('l')) {
         if (selectedIdx === -1) rotationXYZ[1] -= rotSpeed;
-        else shapes[selectedIdx].rotateY(-rotSpeed);
+        else shapes[selectedIdx].rotateY(rotSpeed);
     }
     if (keypressed.has('u')) {
-        if (selectedIdx === -1) rotationXYZ[1] += rotSpeed;
+        if (selectedIdx === -1) rotationXYZ[2] -= rotSpeed;
         else shapes[selectedIdx].rotateZ(rotSpeed);
     }
     if (keypressed.has('o')) {
-        if (selectedIdx === -1) rotationXYZ[1] -= rotSpeed;
+        if (selectedIdx === -1) rotationXYZ[2] += rotSpeed;
         else shapes[selectedIdx].rotateZ(-rotSpeed);
     }
 
