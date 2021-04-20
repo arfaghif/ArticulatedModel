@@ -1,5 +1,12 @@
 function initEventListeners() {
-    document.getElementById("followObjectCheckbox").onchange = function (event) { isFollowingObject = event.target.checked };
+    // document.getElementById("followObjectCheckbox").onchange = function (event) { isFollowingObject = event.target.checked };
+    document.getElementById("animationCheckbox").onchange = function (event) 
+    { 
+        console.log(event.target.checked);
+            shapes.forEach(shape =>{
+                shape.setAnimation(event.target.checked);
+            }); 
+    };
     document.getElementById("projectionDropdown").onchange = function (event) {
         projectionType = event.target.value;
     };

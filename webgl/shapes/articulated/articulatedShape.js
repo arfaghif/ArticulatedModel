@@ -1,5 +1,5 @@
 class ArticulatedShape extends Shape {
-    constructor(shapeName, shape, thetaSlider, axisRotate, vTranslate, center, rotation, scale) {
+    constructor(shapeName, shape, minAngle, maxAngle, thetaSlider, axisRotate, vTranslate, center, rotation, scale, texture) {
         super('articulated-' + shapeName, center, rotation, scale);
         this.shape = shape;
         this.numVertices = shape.numVertices;
@@ -8,15 +8,29 @@ class ArticulatedShape extends Shape {
         this.thetaSlider = thetaSlider
         this.axisRotate = axisRotate;
         this.vTranslate = vTranslate;
+        // console.log(vTranslate);
         this.isUpToDate = false;
         this.isBase = true;
         this.parent = null;
+        this.animation = false;
+        this.texture = texture;
+        this.minAngle = minAngle;
+        this.maxAngle = maxAngle;
+        this.sign = 1;
+        this.autoAnimate();
     }
 
 
     onChangeTheta(numSlider,value){
         if(numSlider === this.thetaSlider){
-            this.theta = value;
+            if(value < this.minAngle){
+                this.theta = this.minAngle;
+            }else if(value > this.maxAngle){
+                this.theta = this.maxAngle;
+            }else{
+                this.theta = value;
+            }
+
         }
         this.child.forEach(shape =>{
             shape.onChangeTheta(numSlider,value);
@@ -42,6 +56,40 @@ class ArticulatedShape extends Shape {
             var r = mult(t,rotate(this.theta,...this.axisRotate));
             return mult(r,translate(negate(vec3(...this.vTranslate))));
         }
+    }
+
+    chageAnimate=()=>{
+        if (this.theta<=this.minAngle){
+            this.sign = 1;
+        }else if(this.theta>=this.maxAngle){
+            this.sign = -1;
+
+        }
+        if(this.animation){
+            if(this.thetaSlider === 1){
+                this.theta += this.sign * 10;
+                console.log("tes");
+            }
+            if(this.thetaSlider === 2){
+                this.theta += this.sign * 15;
+            }
+        }
+    }
+
+    autoAnimate(){
+        setInterval(this.chageAnimate
+        , 100);
+        this.child.forEach(shape =>{
+            shape.autoAnimate();
+        });
+    }
+
+    setAnimation(value){
+        this.animation = value;
+        console.log(this.animation);
+        this.child.forEach(shape =>{
+            shape.setAnimation(value);
+        });
     }
 
     update(startIdx, transformationMatrix, isSelected) {
