@@ -385,7 +385,7 @@ function renderWebGL() {
     var totalVectices = 0;
     shapes.forEach((shape, i) => {
         if (!shape.isUpToDate) {
-            gl.uniform1i(textureOnLoc,shape.texture);
+            // gl.uniform1i(textureOnLoc,shape.texture);
             shape.update(totalVectices, mat4(), selectedIdx === i);
         }
         totalVectices += shape.numVertices;
