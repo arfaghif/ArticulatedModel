@@ -385,7 +385,11 @@ function renderWebGL() {
     var totalVectices = 0;
     shapes.forEach((shape, i) => {
         if (!shape.isUpToDate) {
-            gl.uniform1i(textureOnLoc,shape.texture);
+            console.log(textureOn)
+            if(textureOn !== 1 && textureOn !== 2 && textureOn !== 3){
+                gl.uniform1i(textureOnLoc,shape.texture);
+            }
+            
             shape.update(totalVectices, mat4(), selectedIdx === i);
         }
         gl.drawArrays(gl.TRIANGLES, totalVectices, shape.numVertices);
