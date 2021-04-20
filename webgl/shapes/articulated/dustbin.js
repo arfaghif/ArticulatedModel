@@ -1,6 +1,9 @@
 class Dustbin extends ArticulatedShape {
     constructor(color, center, rotation, scale) {
-        super('dustbin', new DustbinBody(color, center, rotation, scale), 0,0,0, [0,1,0], [0,0,0], center, rotation, scale,3);
+        var baseCenter = vec3(0 , 0, 0);
+        var baseRotation = vec3(0, 0, 0);
+        var baseScale = vec3(1,1,1);  
+        super('dustbin', new DustbinBody(color, baseCenter, baseRotation, baseScale), 0,0,0, [0,1,0], [0,0,0], center, rotation, scale,3);
         var capCenter = vec3(0, 0.325 ,0);
         var translate = [0, 0.325 ,0.15];
         this.addChild(new ArticulatedShape('dustbin-cap', new DustbinCap(color, capCenter, rotation, scale),0,90, 1,[1,0,0] , translate, center, rotation, scale,3));

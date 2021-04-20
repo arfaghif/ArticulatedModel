@@ -8,27 +8,46 @@ function save() {
   anchor.click();
 }
 
-function llla(item) {
-  if (item.shape === "composite-hollow-cube") {
-    temp_load = new HollowCube(item.shapes[0].colors[0], item.center, item.rotation, item.scale);
+function loadEachShape(item) {
+  if (item.shape === "articulated-hand") {;
+    temp_load = new Hand(item.baseShape.colors[0], item.center, item.rotation, item.scale);
+    temp_load.child.forEach(shape=>{
+      shape.baseShape.colors = item.child[0].baseShape.colors;
+      shape.theta = item.child[0].theta;
+      shape.child.forEach(shape2=>{
+        shape2.baseShape.colors=item.child[0].child[0].baseShape.colors;
+        shape2.theta = item.child[0].child[0].theta;
+      });
+    });
     shapes.push(temp_load);
   }
-  if (item.shape === "composite-hollow-chair") {
-    temp_load = new HollowChair(item.shapes[0].colors[0], item.center, item.rotation, item.scale);
+  else  if (item.shape === "articulated-chain-cube") {
+    temp_load = new ChainCube(item.baseShape.colors[0], item.center, item.rotation, item.scale);
+    temp_load.child.forEach(shape=>{
+      shape.baseShape.colors = item.child[0].baseShape.colors;
+      shape.theta = item.child[0].theta;
+      shape.child.forEach(shape2=>{
+        shape2.baseShape.colors=item.child[0].child[0].baseShape.colors;
+        shape2.theta = item.child[0].child[0].theta;
+      });
+    });
+    shapes.push(temp_load);
+  }else  if (item.shape === "articulated-dustbin") {
+    temp_load = new Dustbin(item.baseShape.shapes[0].colors[0], item.center, item.rotation, item.scale);
+    temp_load.child.forEach(shape=>{
+      shape.baseShape.colors = item.child[0].child[0].baseShape.colors;
+      shape.theta = item.child[0].child[0].theta;
+    });
+    temp_load.child[0].baseShape.shapes.forEach(shape =>{
+      shape.colors = item.child[0].baseShape.shapes[0].colors;
+    })
+    temp_load.child[0].theta = item.child[0].theta;
+    temp_load.child[0].child[0].baseShape.colors = item.child[0].child[0].baseShape.colors;
+    temp_load.child[0].child[0].theta = item.child[0].child[0].theta;
+
     shapes.push(temp_load);
   }
-  if (item.shape === "composite-hollow-mine") {
-    temp_load = new HollowMine(undefined, item.center, item.rotation, item.scale);
-    shapes.push(temp_load);
-  }
-  if (item.shape === "simple-cube") {
-    temp_load = new Cube(item.colors, item.center, item.rotation, item.scale);
-    shapes.push(temp_load);
-  }
-  if (item.shape === "composite-snake") {
-    temp_load = new Snake(item.n, item.center, item.rotation, item.scale);
-    shapes.push(temp_load);
-  }
+  
 }
 
 function load() {
@@ -60,6 +79,6 @@ function load() {
     let lines = e.target.result;
     console.log(lines);
     var newArr = JSON.parse(lines);
-    newArr.forEach(llla);
+    newArr.forEach(loadEachShape);
   }
 }

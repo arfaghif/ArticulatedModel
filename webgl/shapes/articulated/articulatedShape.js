@@ -1,17 +1,15 @@
 class ArticulatedShape extends Shape {
     constructor(shapeName, shape, minAngle, maxAngle, thetaSlider, axisRotate, vTranslate, center, rotation, scale, texture) {
         super('articulated-' + shapeName, center, rotation, scale);
-        this.shape = shape;
+        this.baseShape = shape;
         this.numVertices = shape.numVertices;
         this.child = [];
         this.theta = 0;
         this.thetaSlider = thetaSlider
         this.axisRotate = axisRotate;
         this.vTranslate = vTranslate;
-        // console.log(vTranslate);
         this.isUpToDate = false;
         this.isBase = true;
-        this.parent = null;
         this.animation = false;
         this.texture = texture;
         this.minAngle = minAngle;
@@ -40,19 +38,14 @@ class ArticulatedShape extends Shape {
     addChild(shape){
         this.child.push(shape);
         shape.isBase = false;
-        shape.parent = this;
-        var childParent = this;
-        while(childParent !== null){
-            childParent.numVertices += shape.numVertices;
-            childParent = childParent.parent;
-        }
+        shape.parentTR = mat4();
     }
 
     calcTransformationMatrix(){
         if (this.isBase){
             return super.calcTransformationMatrix();
         }else{
-            var t = mult(this.parent.calcTransformationMatrix(), translate(...this.vTranslate));
+            var t = mult(this.parentTR, translate(...this.vTranslate));
             var r = mult(t,rotate(this.theta,...this.axisRotate));
             return mult(r,translate(negate(vec3(...this.vTranslate))));
         }
@@ -94,13 +87,15 @@ class ArticulatedShape extends Shape {
 
     update(startIdx, transformationMatrix, isSelected) {
         var totalVectices = 0;
-        this.shape.update(startIdx, mult(transformationMatrix || mat4(), this.calcTransformationMatrix(), isSelected));
-        totalVectices += this.shape.numVertices;
+        this.baseShape.update(startIdx, mult(transformationMatrix || mat4(), this.calcTransformationMatrix(), isSelected));
+        totalVectices += this.baseShape.numVertices;
         this.child.forEach(shape => {
             if (!this.isUpToDate) {
+                shape.parentTR = this.calcTransformationMatrix();
                 shape.update(startIdx + totalVectices, transformationMatrix || mat4(), isSelected);
             }
             totalVectices += shape.numVertices;
+            this.numVertices = Math.max(this.numVertices,totalVectices);
         });
     }
 }
