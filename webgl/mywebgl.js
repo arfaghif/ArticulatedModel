@@ -288,6 +288,8 @@ function initWebGL() {
     gl.bindTexture( gl.TEXTURE_2D, texture3 );
     gl.uniform1i(gl.getUniformLocation( program, "Tex2"), 3);
 
+    objTangentLoc = gl.getUniformLocation(program, "objTangent");
+    normalLoc = gl.getUniformLocation(program, "normal");
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
     normalMatrixLoc = gl.getUniformLocation(program, "normalMatrix");
@@ -353,6 +355,15 @@ function renderWebGL() {
     var ambientProduct = mult(lightAmbient, materialAmbient);
     var diffuseProduct = mult(lightDiffuse, materialDiffuse);
     var specularProduct = mult(lightSpecular, materialSpecular);
+    // var normal, tangent
+    var normal = vec4(0.0, 1.0, 0.0, 0.0);
+    var tangent = vec3(1.0, 0.0, 0.0);
+
+    
+    gl.uniform4fv( normalLoc,  
+       flatten(normal));
+    gl.uniform3fv( objTangentLoc,
+       flatten(tangent));
     gl.uniform4fv(ambientProductLoc,
        flatten(ambientProduct));
     gl.uniform4fv(diffuseProductLoc,
