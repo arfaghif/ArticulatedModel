@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="style.css">
 
     <script id="vertex-shader" type="x-shader/x-vertex">
+
+        /* bump map vertex shader */
+        varying vec3 L; /* light vector in texture-space coordinates */
+        varying vec3 V; /* view vector in texture-space coordinates */
+
+        uniform vec4 normal;
+        uniform vec3 objTangent; /* tangent vector in object coordinates */
+
         attribute  vec4 vPosition;
         attribute vec4 vColor;
         attribute  vec3 vNormal;
@@ -29,10 +37,8 @@
         uniform vec3 theta;
 
         void main()
-        {
-        
-            
-            vec3 pos = (modelViewMatrix * vPosition).xyz;
+        {           
+        vec3 pos = (modelViewMatrix * vPosition).xyz;
             
             //fixed light postion
             
@@ -69,9 +75,30 @@
 
             //env map
             vec3 eyePos  = (modelViewMatrix*vPosition).xyz;
+            vec3 eyeLightPos = (modelViewMatrix*lightPosition).xyz;
             R = reflect(eyePos, N);
 
-            
+            /* normal, tangent and binormal in eye coordinates */
+
+            vec3 NNN = normalize(normalMatrix*normal.xyz);
+            vec3 T  = normalize(normalMatrix*objTangent);
+            vec3 B = cross(NNN, T);
+        
+            /* light vector in texture space */
+        
+            L.x = dot(T, eyeLightPos-eyePos);
+            L.y = dot(B, eyeLightPos-eyePos);
+            L.z = dot(NNN, eyeLightPos-eyePos);
+        
+            L = normalize(L);
+        
+            /* view vector in texture space */
+        
+            V.x = dot(T, -eyePos);
+            V.y = dot(B, -eyePos);
+            V.z = dot(NNN, -eyePos);
+        
+            V = normalize(V);
         }
     </script>
 
@@ -84,6 +111,8 @@
         varying vec4 fLighting;
         vec4 shaderColor;
         varying vec3 R;
+        varying vec3 L;
+        varying vec3 V;
 
         uniform int textureOn;
         uniform bool shaderOn;
@@ -92,10 +121,17 @@
 
         uniform sampler2D Tex0;
         uniform sampler2D Tex1;
+        uniform sampler2D Tex2;
         uniform samplerCube texMap;
+
+        uniform vec4 diffuseProductBump;
         
         void main()
-        {
+        {   
+            vec4 N = texture2D(Tex2, fTexCoord);
+            vec3 NN =  normalize(2.0*N.xyz-1.0);
+            vec3 LL = normalize(L);
+            float Kd = max(dot(NN, LL), 0.0);
             if(shaderOn){
                 shaderColor = fColor * fLighting;
             } else{
@@ -106,6 +142,9 @@
             }
             else if(textureOn == 2){
                 gl_FragColor = textureCube(texMap, R);
+            }
+            else if(textureOn == 3) {
+                gl_FragColor = vec4(Kd*diffuseProductBump.xyz, 0.75);
             }
             else {
                 gl_FragColor = shaderColor;
@@ -176,6 +215,7 @@
                 <option value="Off">Off</option>
                 <option value="Pattern">Pattern</option>
                 <option value="Environment">Environment</option>
+                <option value="Bump">Bump</option>
             </select>
         </div>
 

@@ -11,6 +11,8 @@ function initEventListeners() {
             textureOn = 1;
         }else if(event.target.value=="Environment"){
             textureOn = 2;
+        }else if(event.target.value == "Bump"){
+            textureOn = 3;
         }else{
             textureOn = 0;
         }

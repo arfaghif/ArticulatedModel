@@ -83,6 +83,45 @@ var image2 = new Uint8Array(4*texSize*texSize);
            }
     }
 
+// Bump Data
+var data = new Array()
+    for (var i = 0; i<= texSize; i++)  data[i] = new Array();
+    for (var i = 0; i<= texSize; i++) for (var j=0; j<=texSize; j++)
+        data[i][j] = 0.0;
+    for (var i = texSize/4; i<3*texSize/4; i++) for (var j = texSize/4; j<3*texSize/4; j++)
+        data[i][j] = 1.0;
+
+// Bump Map Normals
+var normalst = new Array()
+    for (var i=0; i<texSize; i++)  normalst[i] = new Array();
+    for (var i=0; i<texSize; i++) for ( var j = 0; j < texSize; j++)
+        normalst[i][j] = new Array();
+    for (var i=0; i<texSize; i++) for ( var j = 0; j < texSize; j++) {
+        normalst[i][j][0] = data[i][j]-data[i+1][j];
+        normalst[i][j][1] = data[i][j]-data[i][j+1];
+        normalst[i][j][2] = 1;
+    }
+
+// Scale to Texture Coordinates
+    for (var i=0; i<texSize; i++) for (var j=0; j<texSize; j++) {
+       var d = 0;
+       for(k=0;k<3;k++) d+=normalst[i][j][k]*normalst[i][j][k];
+       d = Math.sqrt(d);
+       for(k=0;k<3;k++) normalst[i][j][k]= 0.5*normalst[i][j][k]/d + 0.5;
+    }
+
+// Normal Texture Array
+var image3 = new Uint8Array(3*texSize*texSize);
+
+    for (var i = 0; i < texSize; i++) {
+        for (var j = 0; j < texSize; j++) {
+            for(var k =0; k<3; k++) {
+                image3[3*texSize*i+3*j+k] = 255*normalst[i][j][k];
+            }
+        }
+    }
+        
+
     var texCoordsArray = [];
 
     var texCoord = [
@@ -162,7 +201,18 @@ function configureTexture() {
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                       gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    texture3 = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture3 );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, texSize, texSize, 0, gl.RGB, gl.UNSIGNED_BYTE, image3);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                      gl.NEAREST_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
+
 function initWebGL() {
     canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
@@ -225,6 +275,10 @@ function initWebGL() {
     gl.activeTexture( gl.TEXTURE2 );
     gl.bindTexture( gl.TEXTURE_2D, texture2 );
     gl.uniform1i(gl.getUniformLocation( program, "Tex1"), 2);
+
+    gl.activeTexture( gl.TEXTURE3 );
+    gl.bindTexture( gl.TEXTURE_2D, texture3 );
+    gl.uniform1i(gl.getUniformLocation( program, "Tex2"), 3);
 
     modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
