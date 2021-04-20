@@ -202,9 +202,17 @@ function configureTexture() {
                       gl.NEAREST_MIPMAP_LINEAR );
     gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
+    // texture3 = gl.createTexture();
+    // gl.bindTexture( gl.TEXTURE_2D, texture3 );
+    // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, texSize, texSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, image2);
+    // gl.generateMipmap( gl.TEXTURE_2D );
+    // gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+    //                   gl.NEAREST_MIPMAP_LINEAR );
+    // gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
     texture3 = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture3 );
+    gl.bindTexture(gl.TEXTURE_2D, texture3);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, texSize, texSize, 0, gl.RGB, gl.UNSIGNED_BYTE, image3);
     gl.generateMipmap(gl.TEXTURE_2D);

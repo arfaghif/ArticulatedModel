@@ -1,12 +1,33 @@
 body {
   margin: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  overflow: hidden;
 }
+
+.tight {
+  margin-right: 15px;
+  width: 55%;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 canvas {
-  width: 100vw;
-  height: 100vh;
+  width: 50vw;
+  height: 63vh;
   display: block;
   border-style: groove;
-  border-color: aqua;
+  border-color: rgb(117, 117, 117);
   border-width: 2px;
 }
 /* The actual popup */
@@ -25,6 +46,7 @@ canvas {
   left: 50%;
   margin-left: -80px;
 }
+
 
 
 .popup {
