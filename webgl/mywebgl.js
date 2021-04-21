@@ -386,7 +386,7 @@ function renderWebGL() {
     shapes.forEach((shape, i) => {
         if (!shape.isUpToDate) {
             console.log(textureOn)
-            if(textureOn !== 1 && textureOn !== 2 && textureOn !== 3){
+            if(textureOn !== 1 && textureOn !== 2 && textureOn !== 3 && textureOn !== -99){
                 gl.uniform1i(textureOnLoc,shape.texture);
             }
             

@@ -20,6 +20,8 @@ function initEventListeners() {
             textureOn = 2;
         }else if(event.target.value == "Bump"){
             textureOn = 3;
+        }else if(event.target.value == "Off"){
+            textureOn = -99;
         }else{
             textureOn = 0;
         }
