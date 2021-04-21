@@ -77,8 +77,8 @@ function initEventListeners() {
     document.getElementById("hollowMineButton").onclick = function () {
         shapes.push(new Dustbin());
     }
-    document.getElementById("help").onclick = function () {
-        var popup = document.getElementById("myPopup");
-        popup.classList.toggle("show");
-    }
+    // document.getElementById("help").onclick = function () {
+    //     var popup = document.getElementById("myPopup");
+    //     popup.classList.toggle("show");
+    // }
 }
